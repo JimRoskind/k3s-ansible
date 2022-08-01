@@ -3,16 +3,9 @@
   set_fact:
     hostnumber: "{{ (ansible_default_ipv4.address.split('.')[3] | int) - 200 }}"
 
-- name: Create plausible master hostname
+- name: Create plausible hostname
   set_fact:
     hostname: "obi{{ hostnumber }}"
-  when:
-    - ((hostnumber|int) < 3) == true
-
-- name: Create plausible worker hostname
-  set_fact:
-    hostname: "worker{{ hostnumber }}"
-  when: ((hostnumber|int) > 2) == true
 
 - name: Show potential hostname
   debug:
@@ -21,6 +14,17 @@
 - name:  Rewrite hostname file
   shell:
     cmd: "echo {{ hostname }} >/etc/hostname"
+
+- name: Fixup /etc/hosts file
+  lineinfile:
+    path: /etc/hosts
+    regex: '^([0-9.]+ )NoName.*$'
+    line: '\1{{ hostname }}'
+    backrefs: yes
+    state: present
+
+# When /etc/cloud directory is present, such as with Ubuntu, more
+# work is needed to preserve the host name.
 
 - name: Reboot to update machine's hostname
   reboot:
