@@ -5,4 +5,8 @@
     backrefs: yes
     regexp: '^((?!.*\bcgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory\b).*)$'
     line: '\1 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory'
-  notify: reboot
+  register: cmdline_edit
+
+- name: Reboot if cmdline.txt file was changed
+  reboot:
+  when: cmdline_edit.changed
