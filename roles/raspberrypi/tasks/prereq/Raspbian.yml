@@ -11,7 +11,7 @@
   # Better would be to also check /proc/cgroups for the desired lines,
   # and only then reboot if we had to.
   # Note that we can't complete the install if /proc/cgroups don't have
-  # memory and cpuset lines which end in '1' (which means "enabled").
+  # "memory" (and probably "cpuset") lines which end in '1' (which means "enabled").
   reboot:
   when: cmdline_text.changed
 

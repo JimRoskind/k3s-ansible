@@ -5,8 +5,13 @@
     backrefs: yes
     regexp: '^((?!.*\bcgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory\b).*)$'
     line: '\1 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory'
-  register: cmdline_edit
+  register: cmdline_text
 
-- name: Reboot if cmdline.txt file was changed
+- name: Reboot immediately if we edited the cmdline.txt file
+  # Better would be to also check /proc/cgroups for the desired lines,
+  # and only then reboot if we had to.
+  # Note that we can't complete the install if /proc/cgroups doesn't have
+  # "memory" (and probably "cpuset") lines which end in '1' (which means "enabled").
   reboot:
-  when: cmdline_edit.changed
+  when: cmdline_text.changed
+
