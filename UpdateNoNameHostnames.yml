@@ -15,6 +15,10 @@
   shell:
     cmd: "echo {{ hostname }} >/etc/hostname"
 
+# This might need to be done several times, as
+# the local host seems to list the name twice on a line.
+# I don't know why it doesn't match the "second"
+# appearance of "NoName" on Ubuntu.  :-/ 
 - name: Fixup /etc/hosts file
   lineinfile:
     path: /etc/hosts
@@ -25,6 +29,20 @@
 
 # When /etc/cloud directory is present, such as with Ubuntu, more
 # work is needed to preserve the host name.
+- name: Check for presence of /etc/cloud/cloud.cfg
+  stat:
+    path: /etc/cloud/cloud.cfg
+  register: cloud_cfg
+
+- name: Optionally update cloud.cfg to preserve (new) hostname
+  lineinfile:
+    path: /etc/cloud/cloud.cfg
+    regex: '^(preserve_hostname:) false$'
+    line: '\1 true'
+    state: present
+    backrefs: yes
+    create: no
+  when: cloud_cfg.stat.exists
 
 - name: Reboot to update machine's hostname
   reboot:
