@@ -1,0 +1,68 @@
+Current rebuild instructions:
+
+1) build your dramble physically.  Currently I have 7 nodes, connected
+into an 8-port switch, with the 8th port connecting it to my LAN.
+
+2) Put some OS on a card, and boot each up to get an IP assignment.
+Best is to use static assignments, and kubernetes will generally
+require it.  My setup uses DHCP to assigne the IP addresses
+statically, which means I can change the OS, but the DHCP server will
+ALWAYS give the same set of addresses to the nodes.  This then makes
+it very easy to try different OS versions, rather quickly.  To make it
+really easy, use consecutive IP addresses, which will help in
+automatially naming your nodes (as seen below).
+
+3) Generate a public key on the machine that you'll probably use to
+control your cluster.  This consists of running ssh-keygen.  The
+resulting key will typically be is ~/.ssh/id_rsa.pub.  You'll have to
+cut/paste the contents of that key file in the next step.
+
+4) Setup Raspberry PI imager to be able to load any OS.  To make it
+easy, tell the Raspberry Pi imager to always use the hostname "NoName"
+and be sure to check "Allow public-key authentication only".  The
+ansible script below will always "fix up" the names to be distinct,
+and not having to change the hostname for each image makes it much
+easier to quickly put an OS on each card.  It also means that it won't
+matter which card goes on which Pi, as the name will automagically be
+assigned based on the IP address (so you don't need to keep the
+micro-boot-cards in a special order).  For my IP addresses, I
+currently use 192.196.86.200 onward (sequentially).
+
+5) Put the OS of your choice (currently Raspian 64 or Ubuntu 20 or 22)
+on the boot cards fro your devices.  You should be able to mix/match,
+as as they can all talk the same wire-protocol.
+
+6) Setup your machine to be able to speak with all the hosts.  This
+will (as a side effect) modify your ~/.ssh/known_hosts file. If you
+later do another re-install, then the hosts will get new crytographic
+identities, and you'll need to delete the corresponding lines of
+known_hosts.  The process is as simple as doing an ssh into each host,
+and affirmatively accepting its crypto identity.  For me, I find I can
+quickly do this with the following command (which runs through my 7
+current nodes):
+
+for i in 0 1 2 3 4 5 6; do ssh jar@192.168.86.20"$i"  echo $i machine is now known; done
+
+Each time the login succeeds, you'll have to type "yes" to reach a
+prompt, and automatically go onto the next machine.
+
+7) Edit your hosts.ini file to contain a list of the IP addresses
+you're using.  Validate that ansible is working via:
+
+ansible all -m ping
+
+8) Perform the initial apt update, and automatically name all the
+machines (with the prefix specified in UpdateNoNameHostnames.yml) via:
+
+ansible-playbook AptUpgrade.yml
+
+You can run this anytime, but note that it will induce a reboot on any
+hosts that "require" it after the update.
+
+9) Run the basic install for K3s, via the playbook:
+
+ansible-playbook site.yml
+
+
+
+
