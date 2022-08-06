@@ -1,11 +1,17 @@
 ---
+- name: Setup prefix for all hostnames
+  set_fact:
+    hostname_prefix: "obi"
+
+# Assume sequential IP addresses starting at 200.
+# Hostnames will use prefix, plus the offset (distance) from 200.
 - name: Evaluate probable hostnumber
   set_fact:
     hostnumber: "{{ (ansible_default_ipv4.address.split('.')[3] | int) - 200 }}"
 
 - name: Create plausible hostname
   set_fact:
-    hostname: "obi{{ hostnumber }}"
+    hostname: "{{ hostname_prefix }}{{ hostnumber }}"
 
 - name: Show potential hostname
   debug:
@@ -18,7 +24,7 @@
 # This might need to be done several times, as
 # the local host seems to list the name twice on a line.
 # I don't know why it doesn't match the "second"
-# appearance of "NoName" on Ubuntu.  :-/ 
+# appearance of "NoName" on Ubuntu.  :-/
 - name: Fixup /etc/hosts file
   lineinfile:
     path: /etc/hosts
