@@ -17,3 +17,11 @@
   become: yes
   roles:
     - role: k3s/node
+
+- hosts: lead
+  tasks:
+    - name: Copy across config to enable local kubectl
+      fetch:
+        dest: "~/.kube/config"
+	src: "~/.kube/config"
+        flat: yes
