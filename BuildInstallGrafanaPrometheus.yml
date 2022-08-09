@@ -1,0 +1,62 @@
+---
+- hosts: lead  # Just build and deploy in lead node.
+  become: no
+
+  vars:
+    - build_directory: "/home/jar/cluster-monitoring"
+
+  tasks:
+    - name: Update build system
+      apt:
+        state: latest
+        cache_valid_time: 3600
+        name:
+          - build-essential
+          - golang
+      become: yes
+
+    - name: Ensure presence of directory to clone/build in
+      file:
+        path: "{{ build_directory }}"
+        state: directory
+
+    - name: Clone build repo (cleaning all residuals)
+      git:
+        dest: "{{ build_directory }}"
+        repo: "https://github.com/carlosedp/cluster-monitoring.git"
+        force: yes # Clean out any/all changes
+
+    # Warning: You can't "just use git diff" to generate the patch file.
+    # The resulting patch file will have a/filename and b/filename, which you
+    # should edit to read ./filename and ./filename.
+    # If you don't it will complain that it can't find the file :-/.
+    # If the "patch" module allowed parameters, we'd pass "-p1" to do the fixup.
+    # I'd also suggest you use "git diff -c" to generate the basic patch files.
+    - name: Patch any changes into repo
+      patch:
+        basedir: "{{ build_directory }}"
+        src: "./cluster_monitoring.patch"  # Kept on local machine!
+
+    # Alas, my version of ansible claims there is no "vendor" target :-/
+    # So we'll just use shell, rather than "make"
+#    - name: Make vendor (development) target
+#      make:
+#        chdir: "{{ build_directory }} "
+#        target: "vendor"
+
+    - name: Make vendor (development) target
+      shell:
+        chdir: "{{ build_directory }}"
+        cmd: "make vendor"
+     
+
+    - name: Build our customized version (no target)
+      make:
+        chdir: "{{ build_directory }}"
+
+    - name: Deploy Grafana and Prometheus to Kubernetes
+      make:
+        chdir: "{{ build_directory }}"
+        target: "deploy"
+      become: yes
+...
