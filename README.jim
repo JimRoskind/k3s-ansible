@@ -63,6 +63,21 @@ hosts that "require" it after the update.
 
 ansible-playbook site.yml
 
+10) Copy the config file from the main master to your local ~/.kube
+directory.  This is automatically done at the end of the site.yml
+file, but could be done manually via:
+
+scp 192.168.86.200:~/.kube/config ~/.kube/config
+
+11) Update cluster_monitoring.patch file, which is about to be used in
+upcoming builds and installs.  The delta should be apparent, and you
+should select the IP address of the main "master" node.  This is also
+specified in the hosts.ini as "lead," and used as teh node to build
+Grafana and Prometheus (in the next step).
+
+12) Install Prometheus and Grafana via:
+
+ansible-playbook BuildInstallGrafanaPrometheus.yml
 
 
 
