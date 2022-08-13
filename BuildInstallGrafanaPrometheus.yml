@@ -48,7 +48,7 @@
       shell:
         chdir: "{{ build_directory }}"
         cmd: "make vendor"
-     
+
 
     - name: Build our customized version (no target)
       make:
