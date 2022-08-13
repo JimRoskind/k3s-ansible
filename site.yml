@@ -23,5 +23,5 @@
     - name: Copy across config to enable local kubectl
       fetch:
         dest: "~/.kube/config"
-	src: "~/.kube/config"
+        src: "~/.kube/config"
         flat: yes
