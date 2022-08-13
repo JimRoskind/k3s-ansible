@@ -2,7 +2,7 @@
 - hosts: all
   become: yes
   order: sorted
-  
+
   tasks:
     - name: Read current hostname
       command:
@@ -20,7 +20,7 @@
         update_cache: 'yes'
         cache_valid_time: 3600  # Don't run more than once an hour
         state: latest
-    
+
     - name: See if reboot is now needed
       stat:
         path: /var/run/reboot-required
