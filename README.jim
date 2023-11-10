@@ -46,8 +46,9 @@ for i in 0 1 2 3 4 5 6; do ssh jar@192.168.86.20"$i"  echo $i machine is now kno
 Each time the login succeeds, you'll have to type "yes" to reach a
 prompt, and automatically go onto the next machine.
 
-7) Edit your hosts.ini file to contain a list of the IP addresses
-you're using.  Validate that ansible is working via:
+7) Edit your hosts.ini file (modeled after the sample hosts.ini file)
+to contain a list of the IP addresses you're using.  Validate that
+ansible is working via:
 
 ansible all -m ping
 
@@ -78,6 +79,4 @@ Grafana and Prometheus (in the next step).
 12) Install Prometheus and Grafana via:
 
 ansible-playbook BuildInstallGrafanaPrometheus.yml
-
-
 
