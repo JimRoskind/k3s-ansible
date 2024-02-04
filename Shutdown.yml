@@ -1,0 +1,12 @@
+---
+- hosts: all
+  become: yes
+  order: sorted
+
+  tasks:
+    - name: Do shutdown
+      # Use shell so we can sleep-a-bit while ansible wraps up
+      shell: "sleep 5 && shutdown now"
+      async: 1
+      poll: 0
+...
