@@ -10,5 +10,5 @@
 
     - name: Fix upgrade to oracular (when Update.yml failed)
       command:
-        cmd: sed -i 's/mantic/oracular/g' /etc/apt/sources.list
+        cmd: sed -i 's/oracular/noble/g' /etc/apt/sources.list
 ...
