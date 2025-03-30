@@ -1,0 +1,14 @@
+---
+- hosts: all
+  become: yes
+  order: sorted
+
+  tasks:
+    - name: Fix file to use https
+      command:
+        cmd: sed -i 's/http:/https:/g' /etc/apt/sources.list
+
+    - name: Fix upgrade to oracular (when Update.yml failed)
+      command:
+        cmd: sed -i 's/mantic/oracular/g' /etc/apt/sources.list
+...
