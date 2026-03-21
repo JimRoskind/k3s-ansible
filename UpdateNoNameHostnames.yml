@@ -3,11 +3,11 @@
   set_fact:
     hostname_prefix: "obi"
 
-# Assume sequential IP addresses starting at 200.
-# Hostnames will use prefix, plus the offset (distance) from 200.
+# Assume sequential IP addresses starting at 100.
+# Hostnames will use prefix, plus the offset (distance) from 100.
 - name: Evaluate probable hostnumber
   set_fact:
-    hostnumber: "{{ (ansible_default_ipv4.address.split('.')[3] | int) - 200 }}"
+    hostnumber: "{{ (ansible_default_ipv4.address.split('.')[3] | int) - 100 }}"
 
 - name: Create plausible hostname
   set_fact:
